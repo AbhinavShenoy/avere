@@ -1,20 +1,19 @@
-# YelpCamp
-YelpCamp is a website where users can view, create and review campgrounds. In order to review or create a campground, you must have an account. This project was part of Colt Steele's web dev course on udemy.
+# Avere
+Avere is a website where users can view, create and review trekking routes. In order to review or create a route, you must have an account.
 
-This project was created using Node.js, Express.js, MongoDB, Bootstrap, EJS, Flash.
+This project was created using Node.js, Express.js, MongoDB, Bootstrap, EJS.
 
 Passport was used to handle authentication.
 
 Mapbox was used to locate a campground.
 
-Click [here](https://yelpcamp-ekansh.herokuapp.com/) to see website.
 
 ## Features
-* Users can create and remove campgrounds(which they own).
+* Users can create and remove treks.
 
-* Users can review campgrounds once and remove their review.
+* Users can review treks once and remove their review.
 
-* User can't review his own campground.
+* User can't review his own trek.
 
 * User profiles include information of the user.
 
@@ -36,7 +35,7 @@ For running this project on your local machine:
 
 - Then execute the following command on your terminal in the project directory:
 
-> NOTE : You should be inside YelpCamp directory 
+> NOTE : You should be inside Avere directory 
 
 ```
 $ npm i
