@@ -1,0 +1,186 @@
+<%- layout("layouts/boilerplate.ejs") %> 
+<link rel="stylesheet" href="/css/star-growRotate.css">
+<link rel="stylesheet" href="/css/mapbox.css">  
+
+<link href="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.js"></script>
+<script src="https://unpkg.com/es6-promise@4.2.4/dist/es6-promise.auto.min.js"></script>
+<script src="https://unpkg.com/@mapbox/mapbox-sdk/umd/mapbox-sdk.min.js"></script>
+
+    
+    <div class="container mb-3 mt-5">
+
+        <div class="row">
+            
+            <div class="col">
+                <img src="<%= foundCampground.image %>" class="card-img-top" alt="">
+            </div>
+
+            <div class="col">
+                
+                <div class="">
+                    <div class="card">
+                        <div class="card-title card-header">
+                            <h1 class="text-center"><%= foundCampground.name %> </h1>
+                        </div>
+                        
+                        <div class="p-2 bd-highlight pb-0">
+                            <ul>
+                                <li><b>&#8377;</b> <%= foundCampground.price %>/night </li>
+                                <li><%= foundCampground.location %> </li>
+                                <li><%= foundCampground.description %> </li>
+                            </ul>
+                            <small class="text-muted mt-5">
+                                <% if(foundCampground.reviewsArray.length>0){ %> 
+                                    <% const stars= foundCampground.avgRating %> 
+                                    <% for(let i=1;i<=5;i++){ %>
+                                        <% if(i>stars){ %>
+                                            <span class="fa fa-star"></span> 
+                                        <% }else{ %>    
+                                            <span class="fa fa-star text-warning"></span> %> 
+                                        <% } %>
+                                    <% } %> 
+                                <% } %> 
+                                
+                                <span class="ms-2">
+                                    <% if(foundCampground.reviewsArray.length==0){ %>
+                                        No reviews
+                                    <% }else if(foundCampground.reviewsArray.length==1){ %>
+                                        1 review
+                                    <% }else{ %>
+                                        <%= foundCampground.reviewsArray.length %> reviews  
+                                    <% } %>  
+                                </span>
+                            </small>
+                        </div>
+                        
+                        <div class="card-footer">
+                            - Submitted by <b><a href="/profile/<%= foundCampground.owner._id %>"><%= foundCampground.owner.username %></a></b> on <%= moment(foundCampground.createdAt).format('LL') %> 
+                            <% if(currentUserInfo && foundCampground.owner.equals(currentUserInfo._id)){ %> 
+                                    <form class="inline" action="/campgrounds/<%= foundCampground._id %>?_method=DELETE" method="POST">
+                                        <button class="btn btn-danger">Delete campground</button>
+                                    </form>
+                            <% } %> 
+                        </div>
+                                                    
+                        
+                    </div>
+                                                    
+                </div>
+
+                <div id='map' class="col my-3 border border-secondary">
+                    <div class="mapboxgl-control-container">
+                        <div class="mapboxgl-ctrl-top-left">
+                            <div class="mapboxgl-ctrl mapboxgl-ctrl-group">
+                                <input class="input" id="streets-v11" type="button" name="rtoggle" value="Streets" checked="checked">
+                                <input class="input" id="dark-v10" type="button" name="rtoggle" value="Dark">
+                                <input class="input" id="satellite-v9" type="button" name="rtoggle" value="Satellite">
+                            </div>
+                        </div>
+                        <div class="mapboxgl-ctrl-bottom-left">
+                            <div class="mapboxgl-ctrl mapboxgl-ctrl-group">
+                                <input class="button" type="button" name="rtoggle" value="Center">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <% if(currentUserInfo){ %> 
+            <div class="card p-3">
+                <h5>Leave your Review</h5>
+                <form action="/campgrounds/<%= foundCampground._id %>" method="POST" class="validation-by-ekansh" novalidate>
+                    <!-- FOR RANGE INPUT
+                    <div class="mb-3">
+                        <label for="rating" class="form-label">Rating: <output id="amount">3</output></label>
+                        <input type="range" class="form-range" id="rating" name="rating" min="1" max="5" value="3" oninput="amount.value=rating.value">
+                        
+                    </div> -->
+                    
+                    <fieldset class="starability-growRotate">
+                        <input type="radio" id="no-rate" class="input-no-rate" name="rating" value="5" checked aria-label="No rating." />
+                        
+                        <input type="radio" id="rate1" name="rating" value="1" />
+                        <label for="rate1">1 star.</label>
+                        
+                        <input type="radio" id="rate2" name="rating" value="2" />
+                        <label for="rate2">2 stars.</label>
+                        
+                        <input type="radio" id="rate3" name="rating" value="3" />
+                        <label for="rate3">3 stars.</label>
+                        
+                        <input type="radio" id="rate4" name="rating" value="4" />
+                        <label for="rate4">4 stars.</label>
+                        
+                        <input type="radio" id="rate5" name="rating" value="5" />
+                        <label for="rate5">5 stars.</label>
+                        
+                        <span class="starability-focus-ring"></span>
+                    </fieldset>
+                    
+                    <div class="mb-3">
+                        <label for="text" class="form-label">Review:</label>
+                        <textarea class="form-control" id="text" rows="3" name="text" required></textarea>
+                    </div>
+                    <% if(foundCampground.owner.equals(currentUserInfo._id)){ %>
+                        <button type="button" class="btn btn-secondary" data-bs-toggle="popover" title="Access Denied" 
+                        data-bs-content="You can't review your own campground">Add review</button>  
+                    <% }else{ %>                            
+                        <button class="btn btn-success">Add review</button>
+                    <% } %> 
+                </form>
+            </div>
+        <% } %> 
+
+        <% if(foundCampground.reviewsArray.length){ %> 
+            <hr class="m-0">
+            <hr class="m-0">
+                        
+            <div class="container p-2">
+                <h3 class="text-center">Reviews Section</h3>
+                <div class="row justify-content-center">
+                    <% for(let review of foundCampground.reviewsArray){ %>
+                        <div class="card p-3 m-3 col-4">
+                            <h4 ><%= review.owner.username %> </h4>
+                            <span>
+                                <% for(let i=1;i<=5;i++){ %>
+                                    <% if(i>review.rating){ %>
+                                        <span class="fa fa-star"></span> 
+                                    <% }else{ %>    
+                                        <span class="fa fa-star text-warning"></span> %> 
+                                    <% } %>
+                                <% } %> 
+                            </span>
+                            <small class="text-muted">Reviewed on <%= moment(review.createdAt).format("LL") %> </small>
+                            <p class="mt-2"><%= review.text %> </p>
+
+                            <% if(currentUserInfo && review.owner.equals(currentUserInfo._id)){ %> 
+                                <form action="/campgrounds/<%= foundCampground._id %>/<%= review._id %>?_method=DELETE" method="POST">
+                                    <button class="btn btn-sm btn-danger">Delete Review</button>
+                                </form>
+                            <% } %> 
+        
+                        </div>    
+                    <% } %> 
+                </div>
+                    
+            </div>
+        <% } %> 
+
+    </div>
+
+
+<script>
+    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+        return new bootstrap.Popover(popoverTriggerEl)
+    })
+</script>
+
+<script>
+    const campLocation= '<%- foundCampground.location %>'
+</script>
+
+<script src="/js/map-box.js"></script>
